@@ -4,7 +4,22 @@ document.body.classList.add('js-ready');
 document.addEventListener('DOMContentLoaded', function () {
 
   // ── Sticky nav ──────────────────────────────────────────
-  var header = document.getElementById('site-header');
+  var header   = document.getElementById('site-header');
+  var sections = Array.from(document.querySelectorAll('section[id]'));
+  var navItems = Array.from(document.querySelectorAll('.nav__link'));
+
+  function highlightActiveNav() {
+    var scrollY = window.scrollY + 100;
+    var current = '';
+    sections.forEach(function (section) {
+      if (scrollY >= section.offsetTop) {
+        current = section.getAttribute('id');
+      }
+    });
+    navItems.forEach(function (item) {
+      item.classList.toggle('active', item.getAttribute('href') === '#' + current);
+    });
+  }
 
   function onScroll() {
     if (!header) return;
@@ -38,23 +53,6 @@ document.addEventListener('DOMContentLoaded', function () {
         navToggle.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
       });
-    });
-  }
-
-  // ── Active nav highlighting ──────────────────────────────
-  var sections = Array.from(document.querySelectorAll('section[id]'));
-  var navItems = Array.from(document.querySelectorAll('.nav__link'));
-
-  function highlightActiveNav() {
-    var scrollY = window.scrollY + 100;
-    var current = '';
-    sections.forEach(function (section) {
-      if (scrollY >= section.offsetTop) {
-        current = section.getAttribute('id');
-      }
-    });
-    navItems.forEach(function (item) {
-      item.classList.toggle('active', item.getAttribute('href') === '#' + current);
     });
   }
 
