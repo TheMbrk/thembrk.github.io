@@ -1,0 +1,82 @@
+/* ============================================================
+   animations.css — Keyframes & Reveal Utilities
+   ============================================================ */
+
+/* ── Keyframes ─────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes scrollLine {
+  0%   { transform: scaleY(0); transform-origin: top; }
+  50%  { transform: scaleY(1); transform-origin: top; }
+  51%  { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(88, 130, 166, 0); }
+  50%       { box-shadow: 0 0 16px 4px rgba(88, 130, 166, 0.25); }
+}
+
+/* ── Hero entry animations (CSS-driven, no JS needed) ──── */
+.hero .fade-up {
+  opacity: 0;
+  animation: fadeUp 0.7s ease forwards;
+}
+
+.hero .hero__greeting   { animation-delay: 0.1s; }
+.hero .hero__name       { animation-delay: 0.2s; }
+.hero .hero__title-wrap { animation-delay: 0.35s; }
+.hero .hero__tagline    { animation-delay: 0.45s; }
+.hero .hero__badges     { animation-delay: 0.55s; }
+.hero .hero__summary    { animation-delay: 0.5s; }
+.hero .hero__cta        { animation-delay: 0.65s; }
+.hero .hero__scroll-hint { animation-delay: 0.8s; }
+
+/* ── Scroll-reveal base state ──────────────────────────── */
+/*
+ * Content is ALWAYS visible — reveal is a cosmetic enhancement only.
+ * We start at opacity:0 + translateY, then either:
+ *   (a) JS adds .is-visible when element enters viewport, OR
+ *   (b) the CSS animation auto-reveals after 400ms as a guaranteed fallback.
+ * Either way, content can never stay hidden forever.
+ */
+@keyframes autoReveal {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body.js-ready .reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  /* CSS fallback: reveal automatically after 400ms, no JS required */
+  animation: autoReveal 0.5s ease 0.4s forwards;
+}
+
+body.js-ready .reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  animation: none; /* JS beat the timer — cancel the CSS fallback */
+}
+
+/* ── Cursor blink ──────────────────────────────────────── */
+.hero__cursor {
+  animation: blink 0.9s step-end infinite;
+}
+
+/* ── Scroll line animation ─────────────────────────────── */
+.scroll-line {
+  animation: scrollLine 1.8s ease-in-out infinite;
+}

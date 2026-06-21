@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Mark Cyril Tubera — Software Engineer specializing in API integration, GIS development, and AI-powered tools. Oracle certified, CSE eligible." />
+  <title>Mark Cyril Tubera | Software Engineer</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ════════════════════════════════════ NAV ════════════════════════════════════ -->
+  <header class="site-header" id="site-header">
+    <nav class="nav container">
+      <a href="#hero" class="nav__logo">MCT<span class="accent">.</span></a>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav__links" id="nav-links">
+        <li><a href="#demo"       class="nav__link">AI Demo</a></li>
+        <li><a href="#about"      class="nav__link">About</a></li>
+        <li><a href="#projects"   class="nav__link">Projects</a></li>
+        <li><a href="#experience" class="nav__link">Experience</a></li>
+        <li><a href="#skills"     class="nav__link">Skills</a></li>
+        <li><a href="#contact"    class="nav__link">Contact</a></li>
+        <li>
+          <a href="assets/Resume_Tubera_Mark.pdf" class="btn btn--outline btn--sm" target="_blank" rel="noopener">
+            Resume ↗
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ════════════════════════════════════ HERO ════════════════════════════════════ -->
+    <section class="hero" id="hero">
+      <div class="hero__bg-grid"></div>
+      <div class="container hero__content">
+        <p class="hero__greeting fade-up">Hi, I'm</p>
+        <h1 class="hero__name fade-up">Mark Cyril Tubera</h1>
+        <div class="hero__title-wrap fade-up">
+          <span class="hero__static">Software Engineer &amp; </span>
+          <span class="hero__typed" id="typed-text"></span>
+          <span class="hero__cursor">|</span>
+        </div>
+        <p class="hero__tagline fade-up">
+          I connect systems, map risks, and build AI that answers back.
+        </p>
+        <div class="hero__badges fade-up">
+          <span class="badge">3+ yrs Accenture</span>
+          <span class="badge">Oracle OIC Certified</span>
+          <span class="badge badge--accent">CSE Professional · 88.46</span>
+        </div>
+        <div class="hero__cta fade-up">
+          <a href="#projects" class="btn btn--primary">View Projects</a>
+          <a href="assets/Resume_Tubera_Mark.pdf" class="btn btn--ghost" target="_blank" rel="noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Resume
+          </a>
+        </div>
+        <div class="hero__scroll-hint fade-up">
+          <span>Scroll</span>
+          <div class="scroll-line"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════ FEATURED: AI DEMO ═══════════════════════ -->
+    <section class="section section--alt" id="demo">
+      <div class="container">
+        <div class="section__header reveal">
+          <span class="section__label">01 &mdash; Featured</span>
+          <h2 class="section__title">AI Portfolio Assistant</h2>
+          <p class="section__subtitle">
+            A Groq-powered chatbot trained on my background — ask it about my experience,
+            projects, skills, or anything you'd put in a recruiter brief.
+            Answers in seconds, no sign-in required.
+          </p>
+        </div>
+
+        <div class="demo-layout reveal">
+
+          <!-- Left: description + sample questions -->
+          <div class="demo-intro">
+            <div class="demo-feature-list">
+              <div class="demo-feature">
+                <span class="demo-feature__icon">⚡</span>
+                <span>Powered by <strong>Groq</strong> (ultra-fast LLM inference)</span>
+              </div>
+              <div class="demo-feature">
+                <span class="demo-feature__icon">🧠</span>
+                <span>Knows my full work history, projects &amp; skills</span>
+              </div>
+              <div class="demo-feature">
+                <span class="demo-feature__icon">🔒</span>
+                <span>Stateless — no data stored, no login</span>
+              </div>
+              <div class="demo-feature">
+                <span class="demo-feature__icon">🌐</span>
+                <span>Hosted on <strong>Cloudflare Workers</strong> — always on</span>
+              </div>
+            </div>
+            <p class="demo-intro__label">Try asking:</p>
+            <div class="sample-qs" id="sample-qs">
+              <button class="sample-q" data-q="What did you build at Accenture?">What did you build at Accenture?</button>
+              <button class="sample-q" data-q="Tell me about the Liquefaction WebGIS project.">Tell me about the WebGIS project</button>
+              <button class="sample-q" data-q="Are you eligible for government positions?">Are you gov't eligible?</button>
+              <button class="sample-q" data-q="What is your tech stack?">What's your tech stack?</button>
+              <button class="sample-q" data-q="Why should I hire Mark?">Why hire Mark?</button>
+            </div>
+          </div>
+
+          <!-- Right: embedded chat window -->
+          <div class="demo-window">
+            <div class="demo-window__chrome">
+              <span class="chrome-dot chrome-dot--red"></span>
+              <span class="chrome-dot chrome-dot--yellow"></span>
+              <span class="chrome-dot chrome-dot--green"></span>
+              <span class="chrome-title">Mark's AI Assistant · Groq</span>
+            </div>
+            <div class="demo-messages" id="demo-messages">
+              <div class="demo-msg demo-msg--bot">
+                <div class="demo-msg__avatar">M</div>
+                <div class="demo-msg__bubble">
+                  Hi! I'm Mark's portfolio assistant. Ask me about his experience, projects, or skills. 👋
+                </div>
+              </div>
+            </div>
+            <div class="demo-input-area">
+              <input
+                type="text"
+                id="demo-input"
+                class="demo-input"
+                placeholder="Ask something about Mark..."
+                autocomplete="off"
+                aria-label="Chat message"
+              />
+              <button id="demo-send" class="demo-send" aria-label="Send message">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════ ABOUT ════════════════════════════════════ -->
+    <section class="section" id="about">
+      <div class="container">
+        <div class="section__header reveal">
+          <span class="section__label">02 &mdash; About</span>
+          <h2 class="section__title">Who I Am</h2>
+        </div>
+        <div class="about__grid">
+          <div class="about__text reveal">
+            <p>
+              Software engineer with <strong>3+ years at Accenture</strong> designing and maintaining
+              production REST and SOAP APIs serving enterprise clients. I've built automation tools
+              that cut manual review time from 30 minutes to seconds, and delivered a real-time
+              monitoring dashboard deployed across multiple client environments.
+            </p>
+            <p>
+              Outside Accenture, I build tools that solve concrete problems: a
+              <strong>GeoDjango GIS system</strong> for earthquake liquefaction risk mapping,
+              an <strong>AI chatbot</strong> backed by Groq and Cloudflare Workers, and
+              full-stack web applications using Vue.js and Laravel.
+            </p>
+            <div class="about__meta">
+              <div class="about__meta-item">
+                <span class="meta-label">Location</span>
+                <span class="meta-value">Baguio City, Philippines</span>
+              </div>
+              <div class="about__meta-item">
+                <span class="meta-label">Email</span>
+                <span class="meta-value">
+                  <a href="mailto:jobs.markcyriltubera@gmail.com">jobs.markcyriltubera@gmail.com</a>
+                </span>
+              </div>
+              <div class="about__meta-item">
+                <span class="meta-label">Status</span>
+                <span class="meta-value status-badge">Open to opportunities</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="about__credentials reveal">
+            <div class="cred-card">
+              <div class="cred-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+              </div>
+              <div class="cred-card__body">
+                <span class="cred-card__title">Career Service Professional</span>
+                <span class="cred-card__sub">Civil Service Commission · Rating: <strong>88.46</strong></span>
+                <span class="cred-card__date">May 2026</span>
+              </div>
+            </div>
+            <div class="cred-card">
+              <div class="cred-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <div class="cred-card__body">
+                <span class="cred-card__title">Oracle OIC Foundations Associate</span>
+                <span class="cred-card__sub">Oracle University</span>
+              </div>
+            </div>
+            <div class="cred-card">
+              <div class="cred-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <div class="cred-card__body">
+                <span class="cred-card__title">Oracle VBCS Foundations Associate</span>
+                <span class="cred-card__sub">Oracle University</span>
+              </div>
+            </div>
+            <div class="cred-card">
+              <div class="cred-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              </div>
+              <div class="cred-card__body">
+                <span class="cred-card__title">BS Computer Engineering</span>
+                <span class="cred-card__sub">University of the Cordilleras · 2020</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════ PROJECTS ════════════════════════════════ -->
+    <section class="section section--alt" id="projects">
+      <div class="container">
+        <div class="section__header reveal">
+          <span class="section__label">03 &mdash; Projects</span>
+          <h2 class="section__title">What I've Built</h2>
+        </div>
+        <div class="projects__grid">
+
+          <!-- Project 1: Liquefaction WebGIS -->
+          <article class="proj-card reveal">
+            <div class="proj-card__img">
+              <div class="proj-card__img-bg proj-card__img-bg--geo">
+                <svg class="proj-card__img-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><path d="M2 20h20" opacity=".3"/></svg>
+              </div>
+            </div>
+            <div class="proj-card__body">
+              <div class="proj-card__header">
+                <h3 class="proj-card__title">Liquefaction WebGIS Demo</h3>
+                <span class="proj-card__type">Thesis Project · 2020</span>
+              </div>
+              <p class="proj-card__desc">
+                A geographic information system that assesses soil liquefaction risk for any location
+                in the Cordillera Administrative Region. Users search an address and instantly see
+                susceptibility levels drawn from a spatial database and the PHIVOLCS HazardHunterPH API,
+                overlaid on an interactive Leaflet.js map.
+              </p>
+              <div class="proj-card__tags">
+                <span class="tag tag--sm">GeoDjango</span>
+                <span class="tag tag--sm">Leaflet.js</span>
+                <span class="tag tag--sm">SpatiaLite</span>
+                <span class="tag tag--sm">Python</span>
+                <span class="tag tag--sm">REST API</span>
+                <span class="tag tag--sm">GIS</span>
+              </div>
+              <div class="proj-card__links">
+                <a href="liquefaction-demo.html" class="btn btn--primary btn--sm" target="_blank" rel="noopener">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10A15.3 15.3 0 018 12a15.3 15.3 0 014-10z"/></svg>
+                  Live Demo
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 2: Vue.js Job Application Classifier -->
+          <article class="proj-card reveal">
+            <div class="proj-card__img">
+              <div class="proj-card__img-bg proj-card__img-bg--vue">
+                <svg class="proj-card__img-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+            </div>
+            <div class="proj-card__body">
+              <div class="proj-card__header">
+                <h3 class="proj-card__title">Vue.js Job Application Classifier</h3>
+                <span class="proj-card__type">Personal Project</span>
+              </div>
+              <p class="proj-card__desc">
+                A Vue.js single-page application that classifies job applications by analyzing
+                skills, requirements, and fit criteria. Streamlines early-stage candidate screening
+                by surfacing match signals at a glance — reducing the manual work of matching
+                résumés to job descriptions.
+              </p>
+              <div class="proj-card__tags">
+                <span class="tag tag--sm accent-tag">Vue.js</span>
+                <span class="tag tag--sm">JavaScript</span>
+                <span class="tag tag--sm">NLP</span>
+                <span class="tag tag--sm">Classification</span>
+                <span class="tag tag--sm">REST API</span>
+              </div>
+              <div class="proj-card__links">
+                <a href="https://github.com/TheMbrk" class="btn btn--ghost btn--sm" target="_blank" rel="noopener">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+                  GitHub
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 3: Laravel Webhook Payload Summarizer -->
+          <article class="proj-card reveal">
+            <div class="proj-card__img">
+              <div class="proj-card__img-bg proj-card__img-bg--laravel">
+                <svg class="proj-card__img-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 5c0 0-3.9-.5-6 1.5C13 8.5 13 12 13 12s-.5-3-3-4-7-1-7-1"/><path d="M3 19c0 0 3.9.5 6-1.5C11 15.5 11 12 11 12s.5 3 3 4 7 1 7 1"/><circle cx="12" cy="12" r="2"/></svg>
+              </div>
+            </div>
+            <div class="proj-card__body">
+              <div class="proj-card__header">
+                <h3 class="proj-card__title">Laravel Webhook Payload Summarizer</h3>
+                <span class="proj-card__type">Personal Project</span>
+              </div>
+              <p class="proj-card__desc">
+                A Laravel microservice that receives incoming webhook payloads from third-party APIs
+                and generates concise, human-readable summaries using LLM inference. Reduces the
+                engineering overhead of parsing raw event data in high-volume webhook integrations.
+              </p>
+              <div class="proj-card__tags">
+                <span class="tag tag--sm accent-tag">Laravel</span>
+                <span class="tag tag--sm">PHP</span>
+                <span class="tag tag--sm">Webhooks</span>
+                <span class="tag tag--sm">LLM</span>
+                <span class="tag tag--sm">REST API</span>
+              </div>
+              <div class="proj-card__links">
+                <a href="https://github.com/TheMbrk" class="btn btn--ghost btn--sm" target="_blank" rel="noopener">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+                  GitHub
+                </a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════ EXPERIENCE ══════════════════════════════ -->
+    <section class="section" id="experience">
+      <div class="container">
+        <div class="section__header reveal">
+          <span class="section__label">04 &mdash; Experience</span>
+          <h2 class="section__title">Where I've Worked</h2>
+        </div>
+        <div class="timeline">
+
+          <div class="timeline__item reveal">
+            <div class="timeline__marker"></div>
+            <div class="timeline__card">
+              <div class="timeline__header">
+                <div>
+                  <h3 class="timeline__role">Software Engineer</h3>
+                  <span class="timeline__company">Accenture, Inc.</span>
+                </div>
+                <div class="timeline__meta">
+                  <span class="timeline__period">Jun 2021 – Jun 2024</span>
+                  <span class="timeline__location">Taguig, Philippines</span>
+                </div>
+              </div>
+              <div class="timeline__body">
+                <div class="exp-group">
+                  <h4 class="exp-group__title">API Development &amp; Integration</h4>
+                  <ul class="exp-list">
+                    <li>Designed and maintained multiple production RESTful and SOAP APIs serving enterprise applications — enabling secure data exchange across distributed systems.</li>
+                    <li>Implemented OAuth 2.0 security and collaborated with cross-functional teams to architect integration solutions aligned with business and risk frameworks.</li>
+                  </ul>
+                </div>
+                <div class="exp-group">
+                  <h4 class="exp-group__title">Automation &amp; Monitoring</h4>
+                  <ul class="exp-list">
+                    <li>Built a log-analysis tool that replaced ~30 minutes of manual review per run with a filter-based query pipeline returning results in seconds.</li>
+                    <li>Developed an Oracle VBCS web app monitoring real-time execution metrics for 1,000+ integration workflows across 3 client environments — significantly reducing incident response time.</li>
+                  </ul>
+                </div>
+                <div class="exp-group">
+                  <h4 class="exp-group__title">Documentation</h4>
+                  <ul class="exp-list">
+                    <li>Authored API specs, integration guides, and runbooks; established documentation standards that improved onboarding efficiency across multiple project teams.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="timeline__tags">
+                <span class="tag tag--sm">Oracle OIC</span>
+                <span class="tag tag--sm">Oracle VBCS</span>
+                <span class="tag tag--sm">REST APIs</span>
+                <span class="tag tag--sm">SOAP APIs</span>
+                <span class="tag tag--sm">OAuth 2.0</span>
+                <span class="tag tag--sm">Python</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════ SKILLS ══════════════════════════════════ -->
+    <section class="section section--alt" id="skills">
+      <div class="container">
+        <div class="section__header reveal">
+          <span class="section__label">05 &mdash; Skills</span>
+          <h2 class="section__title">Technical Stack</h2>
+        </div>
+        <div class="skills__grid">
+
+          <div class="skill-group reveal">
+            <div class="skill-group__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <h3 class="skill-group__title">Languages</h3>
+            <div class="skill-tags">
+              <span class="tag">Python</span>
+              <span class="tag">Java</span>
+              <span class="tag">JavaScript</span>
+              <span class="tag">PHP</span>
+               </div>
+          </div>
+
+          <div class="skill-group reveal">
+            <div class="skill-group__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </div>
+            <h3 class="skill-group__title">Frameworks</h3>
+            <div class="skill-tags">
+              <span class="tag">Django</span>
+              <span class="tag">GeoDjango</span>
+              <span class="tag">Laravel</span>
+              <span class="tag">Vue.js</span>
+              <span class="tag">Leaflet.js</span>
+            </div>
+          </div>
+
+          <div class="skill-group reveal">
+            <div class="skill-group__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            </div>
+            <h3 class="skill-group__title">API &amp; Integration</h3>
+            <div class="skill-tags">
+              <span class="tag accent-tag">RESTful APIs</span>
+              <span class="tag accent-tag">SOAP APIs</span>
+              <span class="tag accent-tag">OAuth 2.0</span>
+              <span class="tag">Oracle OIC</span>
+              <span class="tag">Oracle VBCS</span>
+              <span class="tag">Webhooks</span>
+            </div>
+          </div>
+
+          <div class="skill-group reveal">
+            <div class="skill-group__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            </div>
+            <h3 class="skill-group__title">Databases</h3>
+            <div class="skill-tags">
+              <span class="tag">MySQL</span>
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">SpatiaLite</span>
+              <span class="tag">SQL</span>
+            </div>
+          </div>
+
+          <div class="skill-group reveal">
+            <div class="skill-group__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <h3 class="skill-group__title">AI &amp; Tooling</h3>
+            <div class="skill-tags">
+              <span class="tag accent-tag">Groq API</span>
+              <span class="tag">Cloudflare Workers</span>
+              <span class="tag">LLM Integration</span>
+              <span class="tag">Automation</span>
+            </div>
+          </div>
+
+          <div class="skill-group reveal">
+            <div class="skill-group__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            </div>
+            <h3 class="skill-group__title">Dev Tools</h3>
+            <div class="skill-tags">
+              <span class="tag">Git</span>
+              <span class="tag">CI/CD</span>
+              <span class="tag">Agile/Scrum</span>
+              <span class="tag">HTML5</span>
+              <span class="tag">CSS3</span>
+              <span class="tag">GIS / GeoPy</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="section__header reveal">
+          <span class="section__label">06 &mdash; Contact</span>
+          <h2 class="section__title">Get In Touch</h2>
+          <p class="section__subtitle">
+            Open to full-time roles, freelance projects, and government opportunities.
+            Fill out the form and I'll respond as soon as I can.
+          </p>
+        </div>
+        <div class="contact__layout">
+
+          <div class="contact__info reveal">
+            <a href="mailto:jobs.markcyriltubera@gmail.com" class="contact__link">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              jobs.markcyriltubera@gmail.com
+            </a>
+            <a href="https://www.linkedin.com/in/mark-cyril-tubera/" class="contact__link" target="_blank" rel="noopener">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              linkedin.com/in/mark-cyril-tubera
+            </a>
+            <a href="https://github.com/TheMbrk" class="contact__link" target="_blank" rel="noopener">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              github.com/TheMbrk
+            </a>
+          </div>
+
+          <form
+            class="contact-form reveal"
+            id="contact-form"
+            action="https://formspree.io/f/xzdqwdka"
+            method="POST"
+            novalidate
+            onsubmit="return submitContactForm(event)"
+          >
+            <!-- Fallback: if JS fails, redirect back to portfolio instead of Formspree's thanks page -->
+            <input type="hidden" name="_next" value="https://thembrk.github.io/#contact" />
+            <input type="hidden" name="_subject" value="New message from portfolio" />
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" id="name" name="name" class="form-input" placeholder="Juan dela Cruz" required autocomplete="name" />
+              </div>
+              <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="juan@example.com" required autocomplete="email" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="message" class="form-label">Message</label>
+              <textarea id="message" name="message" class="form-input form-textarea" rows="5" placeholder="Tell me about the role or project..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full" id="form-submit">
+              <span id="btn-text">Send Message</span>
+              <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+            <div id="form-success" class="form-feedback form-feedback--success" hidden>
+              Message sent! I'll get back to you soon.
+            </div>
+            <div id="form-error" class="form-feedback form-feedback--error" hidden>
+              Something went wrong. Email me directly at jobs.markcyriltubera@gmail.com
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__copy">&copy; <span id="footer-year"></span> Mark Cyril Tubera &mdash; Baguio City, PH</p>
+      <div class="footer__links">
+        <a href="https://github.com/TheMbrk" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/mark-cyril-tubera/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+      </div>
+      <a href="#hero" class="footer__back-top" aria-label="Back to top">&#8593; Top</a>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/typing.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
