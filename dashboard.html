@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Tracker Dashboard | Mark Tubera</title>
+
+    <!-- Fonts — same as portfolio -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.prod.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"></script>
+
+    <style>
+        /* ── Design tokens — mirrors portfolio style.css ─────── */
+        :root {
+            --clr-bg:          #0d1117;
+            --clr-bg-alt:      #111820;
+            --clr-surface:     #161d27;
+            --clr-surface-2:   #1c2533;
+            --clr-border:      rgba(255,255,255,0.07);
+            --clr-border-mid:  rgba(255,255,255,0.12);
+            --clr-accent:      #5882a6;
+            --clr-accent-dim:  rgba(88,130,166,0.15);
+            --clr-accent-glow: rgba(88,130,166,0.3);
+            --clr-text:        #e2e8f0;
+            --clr-muted:       #7a8a9e;
+            --clr-faint:       #4a5568;
+            --font-sans:       'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono:       'JetBrains Mono', 'Fira Code', monospace;
+            --radius:          10px;
+            --radius-sm:       6px;
+            --transition:      0.2s ease;
+
+            /* Kanban column accent colours */
+            --col-saved:     #5882a6;
+            --col-applied:   #7c65a6;
+            --col-interview: #a67d58;
+            --col-offer:     #3d9e6e;
+            --col-rejected:  #a64c4c;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--clr-bg);
+            color: var(--clr-text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+        /* ── Header ─────────────────────────────────────────── */
+        .site-header {
+            background: var(--clr-surface);
+            border-bottom: 1px solid var(--clr-border);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left  { display: flex; align-items: center; gap: 16px; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--clr-text);
+        }
+        .nav-logo .accent { color: var(--clr-accent); }
+        .header-divider {
+            width: 1px;
+            height: 18px;
+            background: var(--clr-border-mid);
+        }
+        .header-subtitle {
+            font-size: 0.82rem;
+            color: var(--clr-muted);
+            font-weight: 500;
+        }
+
+        /* ── Buttons ─────────────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.825rem;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            letter-spacing: 0.01em;
+            transition: all var(--transition);
+            border: 1px solid transparent;
+        }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: var(--clr-accent);
+            color: #fff;
+            border-color: var(--clr-accent);
+        }
+        .btn-primary:hover {
+            background: #4a6f8f;
+            border-color: #4a6f8f;
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--clr-muted);
+            border-color: var(--clr-border-mid);
+        }
+        .btn-ghost:hover {
+            background: var(--clr-surface-2);
+            color: var(--clr-text);
+        }
+
+        .btn-icon {
+            background: transparent;
+            color: var(--clr-muted);
+            padding: 5px 7px;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            line-height: 0;
+        }
+        .btn-icon:hover { background: var(--clr-surface-2); color: var(--clr-text); }
+        .btn-icon.danger:hover { background: rgba(166,76,76,0.18); color: #e57373; }
+
+        /* ── Board layout ────────────────────────────────────── */
+        .board-wrap {
+            padding: 24px 28px;
+            overflow-x: auto;
+            min-height: calc(100vh - 60px);
+        }
+        .board {
+            display: flex;
+            gap: 12px;
+            min-width: max-content;
+            align-items: flex-start;
+        }
+
+        /* ── Column ──────────────────────────────────────────── */
+        .column {
+            width: 276px;
+            flex-shrink: 0;
+            background: var(--clr-surface);
+            border: 1px solid var(--clr-border);
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        .column.drag-over {
+            border-color: var(--clr-accent);
+            box-shadow: 0 0 0 2px var(--clr-accent-glow);
+        }
+
+        .col-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 14px 10px;
+            border-bottom: 1px solid var(--clr-border);
+        }
+        .col-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .col-label {
+            flex: 1;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--clr-text);
+        }
+        .col-count {
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            color: var(--clr-muted);
+            background: var(--clr-surface-2);
+            border: 1px solid var(--clr-border-mid);
+            border-radius: 99px;
+            padding: 1px 8px;
+        }
+
+        .col-cards {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 100px;
+        }
+
+        /* ── Card ────────────────────────────────────────────── */
+        .card {
+            background: var(--clr-surface-2);
+            border: 1px solid var(--clr-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 13px;
+            cursor: grab;
+            user-select: none;
+            transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+        }
+        .card:hover {
+            background: #212d3d;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+            transform: translateY(-1px);
+        }
+        .card:active { cursor: grabbing; }
+        .card.dragging { opacity: 0.4; }
+
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+        .card-company {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--clr-text);
+            line-height: 1.3;
+        }
+        .card-company a:hover { color: var(--clr-accent); text-decoration: underline; }
+        .card-position {
+            font-size: 0.78rem;
+            color: var(--clr-muted);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .score-badge {
+            flex-shrink: 0;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            padding: 2px 7px;
+            border-radius: 99px;
+            border: 1px solid;
+        }
+        .score-high { background: rgba(61,158,110,0.12); color: #3d9e6e; border-color: rgba(61,158,110,0.3); }
+        .score-mid  { background: rgba(166,125,88,0.12); color: #c9955a; border-color: rgba(166,125,88,0.3); }
+        .score-low  { background: rgba(166,76,76,0.12);  color: #c96464; border-color: rgba(166,76,76,0.3); }
+
+        .skills-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        .skill-pill {
+            font-size: 0.67rem;
+            font-weight: 500;
+            font-family: var(--font-mono);
+            background: var(--clr-accent-dim);
+            border: 1px solid rgba(88,130,166,0.2);
+            color: #93b8d4;
+            border-radius: 4px;
+            padding: 2px 6px;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding-top: 8px;
+            border-top: 1px solid var(--clr-border);
+        }
+        .card-date {
+            margin-left: auto;
+            font-size: 0.68rem;
+            font-family: var(--font-mono);
+            color: var(--clr-faint);
+        }
+
+        .empty-col {
+            font-size: 0.75rem;
+            color: var(--clr-faint);
+            text-align: center;
+            padding: 24px 12px;
+            border: 1.5px dashed var(--clr-border-mid);
+            border-radius: var(--radius-sm);
+        }
+
+        /* ── State screens ───────────────────────────────────── */
+        .state-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 60px);
+            gap: 14px;
+            color: var(--clr-muted);
+        }
+        .state-screen p { font-size: 0.9rem; }
+        .state-screen code {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            background: var(--clr-surface-2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #93b8d4;
+        }
+        .spinner {
+            width: 32px; height: 32px;
+            border: 2.5px solid var(--clr-border-mid);
+            border-top-color: var(--clr-accent);
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Modal ───────────────────────────────────────────── */
+        .overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.72);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            backdrop-filter: blur(2px);
+        }
+        .modal {
+            background: var(--clr-surface);
+            border: 1px solid var(--clr-border-mid);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.55);
+        }
+        .modal-lg { max-width: 660px; }
+
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid var(--clr-border);
+        }
+        .modal-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--clr-text);
+        }
+        .modal-sub {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--clr-muted);
+            margin-left: 6px;
+        }
+        .modal-close {
+            color: var(--clr-muted);
+            padding: 4px;
+            border-radius: 4px;
+            transition: color var(--transition);
+            line-height: 0;
+        }
+        .modal-close:hover { color: var(--clr-text); }
+
+        .modal-body   { padding: 22px; }
+        .modal-footer {
+            padding: 14px 22px;
+            border-top: 1px solid var(--clr-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* ── Form ────────────────────────────────────────────── */
+        .form-group   { margin-bottom: 16px; }
+        .form-row     { display: flex; gap: 14px; }
+        .form-row .form-group { flex: 1; }
+
+        .form-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--clr-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--clr-surface-2);
+            border: 1px solid var(--clr-border-mid);
+            border-radius: var(--radius-sm);
+            color: var(--clr-text);
+            font-family: var(--font-sans);
+            font-size: 0.875rem;
+            padding: 9px 12px;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            outline: none;
+            resize: vertical;
+        }
+        .form-input::placeholder { color: var(--clr-faint); }
+        .form-input:focus {
+            border-color: var(--clr-accent);
+            box-shadow: 0 0 0 3px var(--clr-accent-glow);
+        }
+        select.form-input option { background: var(--clr-surface-2); }
+        input[type="file"].form-input { cursor: pointer; padding: 6px 10px; }
+
+        .form-hint {
+            font-size: 0.72rem;
+            color: var(--clr-faint);
+            margin-top: 5px;
+            font-family: var(--font-mono);
+        }
+
+        .divider { border: none; border-top: 1px solid var(--clr-border); margin: 20px 0; }
+
+        /* ── Resume match results ────────────────────────────── */
+        .score-circle-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 22px;
+        }
+        .score-circle {
+            width: 96px; height: 96px;
+            border-radius: 50%;
+            border: 4px solid;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-family: var(--font-mono);
+        }
+        .score-circle .score-num { font-size: 1.65rem; line-height: 1; }
+        .score-circle .score-pct { font-size: 0.65rem; font-weight: 600; opacity: 0.8; }
+        .score-ring-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--clr-muted);
+        }
+
+        .result-section { margin-bottom: 18px; }
+        .result-section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--clr-muted);
+            margin-bottom: 8px;
+        }
+        .pill-list { display: flex; flex-wrap: wrap; gap: 5px; }
+        .pill-match {
+            font-size: 0.75rem; font-weight: 500;
+            font-family: var(--font-mono);
+            background: rgba(61,158,110,0.1);
+            border: 1px solid rgba(61,158,110,0.28);
+            color: #5fc494;
+            border-radius: 4px;
+            padding: 3px 8px;
+        }
+        .pill-gap {
+            font-size: 0.75rem; font-weight: 500;
+            font-family: var(--font-mono);
+            background: rgba(166,76,76,0.1);
+            border: 1px solid rgba(166,76,76,0.28);
+            color: #e07777;
+            border-radius: 4px;
+            padding: 3px 8px;
+        }
+        .recommendation-box {
+            background: var(--clr-accent-dim);
+            border: 1px solid rgba(88,130,166,0.2);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 0.85rem;
+            color: #93b8d4;
+            line-height: 1.6;
+        }
+
+        /* ── Toast ───────────────────────────────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            z-index: 999;
+            background: var(--clr-surface-2);
+            border: 1px solid var(--clr-border-mid);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            font-size: 0.845rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+            animation: slideUp 0.18s ease;
+            max-width: 300px;
+        }
+        .toast-success { border-left: 3px solid #3d9e6e; color: #5fc494; }
+        .toast-error   { border-left: 3px solid #a64c4c; color: #e07777; }
+        .toast span { color: var(--clr-text); }
+        @keyframes slideUp {
+            from { transform: translateY(16px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+        @media (max-width: 640px) {
+            .board-wrap { padding: 14px; }
+            .site-header { padding: 0 16px; }
+            .header-subtitle { display: none; }
+            .form-row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+    <!-- ── Header ──────────────────────────────────────────── -->
+    <header class="site-header">
+        <div class="header-left">
+            <a href="index.html" class="nav-logo">MCT<span class="accent">.</span></a>
+            <div class="header-divider"></div>
+            <span class="header-subtitle">Job Tracker Dashboard</span>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-ghost" @click="fetchApplications" title="Refresh">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                Refresh
+            </button>
+            <button class="btn btn-primary" @click="openNewJob">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Application
+            </button>
+        </div>
+    </header>
+
+    <!-- ── Loading ─────────────────────────────────────────── -->
+    <div v-if="loading" class="state-screen">
+        <div class="spinner"></div>
+        <p style="color:var(--clr-muted)">Loading applications…</p>
+    </div>
+
+    <!-- ── API Error ────────────────────────────────────────── -->
+    <div v-else-if="fatalError" class="state-screen">
+        <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--col-rejected)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p style="color:#e07777;font-weight:600">Cannot reach the API</p>
+        <p>Make sure Laravel is running on <code>http://localhost:8000</code></p>
+        <button class="btn btn-primary" @click="fetchApplications">Retry</button>
+    </div>
+
+    <!-- ── Kanban Board ─────────────────────────────────────── -->
+    <div v-else class="board-wrap">
+        <div class="board">
+            <div
+                v-for="col in columns"
+                :key="col.id"
+                class="column"
+                :class="{ 'drag-over': hoveredCol === col.id }"
+                @dragover.prevent="hoveredCol = col.id"
+                @dragleave="hoveredCol = null"
+                @drop="onDrop($event, col.id)"
+            >
+                <div class="col-header">
+                    <span class="col-dot" :style="{ background: col.color }"></span>
+                    <span class="col-label">{{ col.label }}</span>
+                    <span class="col-count">{{ columnApps[col.id].length }}</span>
+                </div>
+
+                <div class="col-cards">
+                    <div
+                        v-for="app in columnApps[col.id]"
+                        :key="app.id"
+                        class="card"
+                        :class="{ dragging: draggedId === app.id }"
+                        draggable="true"
+                        @dragstart="onDragStart(app.id)"
+                        @dragend="draggedId = null; hoveredCol = null"
+                    >
+                        <div class="card-top">
+                            <span class="card-company">
+                                <a v-if="app.job_url" :href="app.job_url" target="_blank" rel="noopener" @click.stop>{{ app.company_name }}</a>
+                                <template v-else>{{ app.company_name }}</template>
+                            </span>
+                            <span
+                                v-if="getMatchScore(app) !== null"
+                                class="score-badge"
+                                :class="scoreClass(getMatchScore(app))"
+                            >{{ getMatchScore(app) }}%</span>
+                        </div>
+
+                        <p class="card-position">{{ app.position }}</p>
+
+                        <div v-if="getKeywords(app).length" class="skills-wrap">
+                            <span v-for="kw in getKeywords(app)" :key="kw" class="skill-pill">{{ kw }}</span>
+                        </div>
+
+                        <div class="card-footer">
+                            <button
+                                class="btn-icon"
+                                title="Analyze resume fit"
+                                @click.stop="openResumeModal(app)"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            </button>
+                            <button
+                                class="btn-icon danger"
+                                title="Delete"
+                                @click.stop="deleteApplication(app.id)"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                            </button>
+                            <span class="card-date">{{ formatDate(app.created_at) }}</span>
+                        </div>
+                    </div>
+
+                    <div v-if="!columnApps[col.id].length" class="empty-col">
+                        Drop here
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── New Application Modal ────────────────────────────── -->
+    <div v-if="showNewJobModal" class="overlay" @click.self="showNewJobModal = false">
+        <div class="modal">
+            <div class="modal-head">
+                <span class="modal-title">New Application</span>
+                <button class="modal-close" @click="showNewJobModal = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Company Name *</label>
+                        <input type="text" class="form-input" v-model="newJob.company_name" placeholder="e.g. Accenture" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-input" v-model="newJob.status">
+                            <option v-for="col in columns" :key="col.id" :value="col.id">{{ col.label }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Position / Role *</label>
+                    <input type="text" class="form-input" v-model="newJob.position" placeholder="e.g. Software Engineer II" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Job URL</label>
+                    <input type="url" class="form-input" v-model="newJob.job_url" placeholder="https://..." />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Job Description</label>
+                    <textarea class="form-input" v-model="newJob.job_description" rows="6" placeholder="Paste the full job description. Watson NLU will extract keywords automatically."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" @click="showNewJobModal = false">Cancel</button>
+                <button
+                    class="btn btn-primary"
+                    @click="submitNewJob"
+                    :disabled="submitting || !newJob.company_name.trim() || !newJob.position.trim()"
+                >
+                    <svg v-if="submitting" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 0.75s linear infinite"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    {{ submitting ? 'Saving…' : 'Save Application' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Resume Match Modal ───────────────────────────────── -->
+    <div v-if="showResumeModal" class="overlay" @click.self="showResumeModal = false">
+        <div class="modal modal-lg">
+            <div class="modal-head">
+                <div>
+                    <span class="modal-title">Resume Match</span>
+                    <span v-if="resumeTarget" class="modal-sub">— {{ resumeTarget.company_name }}: {{ resumeTarget.position }}</span>
+                </div>
+                <button class="modal-close" @click="showResumeModal = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Resume PDF *</label>
+                    <input type="file" class="form-input" accept=".pdf" @change="onFileChange" />
+                    <p class="form-hint">// PDF text extracted via smalot/pdfparser → compared against job description</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Job Description *</label>
+                    <textarea class="form-input" v-model="resumeJobDesc" rows="5" placeholder="Paste job description…"></textarea>
+                </div>
+                <button
+                    class="btn btn-primary"
+                    @click="analyzeResume"
+                    :disabled="analyzing || !resumeFile || !resumeJobDesc.trim()"
+                    style="width:100%;justify-content:center;"
+                >
+                    <svg v-if="analyzing" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 0.75s linear infinite"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    {{ analyzing ? 'Analyzing with Watson NLU…' : 'Analyze Resume Fit' }}
+                </button>
+
+                <!-- Results -->
+                <template v-if="matchResult">
+                    <hr class="divider" />
+                    <div class="score-circle-wrap">
+                        <div
+                            class="score-circle"
+                            :style="{
+                                color: scoreHex(matchResult.match_score ?? matchResult.score ?? 0),
+                                borderColor: scoreHex(matchResult.match_score ?? matchResult.score ?? 0)
+                            }"
+                        >
+                            <span class="score-num">{{ matchResult.match_score ?? matchResult.score ?? 0 }}</span>
+                            <span class="score-pct">%</span>
+                        </div>
+                        <span class="score-ring-label">Match Score</span>
+                    </div>
+
+                    <div class="result-section" v-if="normalizeList(matchResult.matched_skills).length">
+                        <p class="result-section-title">✓ Matched Skills ({{ normalizeList(matchResult.matched_skills).length }})</p>
+                        <div class="pill-list">
+                            <span v-for="s in normalizeList(matchResult.matched_skills)" :key="s" class="pill-match">{{ s }}</span>
+                        </div>
+                    </div>
+
+                    <div class="result-section" v-if="normalizeList(matchResult.missing_skills).length">
+                        <p class="result-section-title">✗ Skill Gaps ({{ normalizeList(matchResult.missing_skills).length }})</p>
+                        <div class="pill-list">
+                            <span v-for="s in normalizeList(matchResult.missing_skills)" :key="s" class="pill-gap">{{ s }}</span>
+                        </div>
+                    </div>
+
+                    <div class="result-section" v-if="matchResult.recommendation">
+                        <p class="result-section-title">Recommendation</p>
+                        <p class="recommendation-box">{{ matchResult.recommendation }}</p>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Toast ───────────────────────────────────────────── -->
+    <transition name="fade">
+        <div v-if="toast" class="toast" :class="'toast-' + toast.type">
+            <svg v-if="toast.type === 'success'" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>{{ toast.msg }}</span>
+        </div>
+    </transition>
+
+</div>
+
+<script>
+const { createApp } = Vue;
+
+createApp({
+    data() {
+        return {
+            API: 'http://localhost:8000/api',
+
+            applications: [],
+            loading:      true,
+            fatalError:   false,
+
+            columns: [
+                { id: 'saved',     label: 'Saved',     color: 'var(--col-saved)'     },
+                { id: 'applied',   label: 'Applied',   color: 'var(--col-applied)'   },
+                { id: 'interview', label: 'Interview', color: 'var(--col-interview)' },
+                { id: 'offer',     label: 'Offer',     color: 'var(--col-offer)'     },
+                { id: 'rejected',  label: 'Rejected',  color: 'var(--col-rejected)'  },
+            ],
+
+            draggedId:  null,
+            hoveredCol: null,
+
+            showNewJobModal: false,
+            newJob: { company_name: '', position: '', job_description: '', job_url: '', status: 'saved' },
+            submitting: false,
+
+            showResumeModal: false,
+            resumeTarget:    null,
+            resumeFile:      null,
+            resumeJobDesc:   '',
+            matchResult:     null,
+            analyzing:       false,
+            matchResults:    {},
+
+            toast:      null,
+            toastTimer: null,
+        };
+    },
+
+    computed: {
+        columnApps() {
+            const map = {};
+            for (const col of this.columns) {
+                map[col.id] = this.applications.filter(a => a.status === col.id);
+            }
+            return map;
+        },
+    },
+
+    async mounted() {
+        await this.fetchApplications();
+    },
+
+    methods: {
+        async fetchApplications() {
+            this.loading = true;
+            this.fatalError = false;
+            try {
+                const { data } = await axios.get(`${this.API}/job-applications`);
+                this.applications = Array.isArray(data) ? data : (data.data ?? []);
+            } catch {
+                this.fatalError = true;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async submitNewJob() {
+            if (!this.newJob.company_name.trim() || !this.newJob.position.trim()) return;
+            this.submitting = true;
+            try {
+                const { data } = await axios.post(`${this.API}/job-applications`, this.newJob);
+                const created = data.data ?? data;
+                this.applications.push(created);
+                this.showNewJobModal = false;
+                this.showToast(`Added: ${created.position} @ ${created.company_name}`, 'success');
+            } catch (e) {
+                this.showToast(e.response?.data?.message ?? 'Failed to create application.', 'error');
+            } finally {
+                this.submitting = false;
+            }
+        },
+
+        async deleteApplication(id) {
+            if (!confirm('Delete this application?')) return;
+            const prev = [...this.applications];
+            this.applications = this.applications.filter(a => a.id !== id);
+            try {
+                await axios.delete(`${this.API}/job-applications/${id}`);
+                delete this.matchResults[id];
+                this.showToast('Deleted.', 'success');
+            } catch {
+                this.applications = prev;
+                this.showToast('Delete failed.', 'error');
+            }
+        },
+
+        onDragStart(id) { this.draggedId = id; },
+
+        async onDrop(e, status) {
+            this.hoveredCol = null;
+            if (!this.draggedId) return;
+            const app = this.applications.find(a => a.id === this.draggedId);
+            this.draggedId = null;
+            if (!app || app.status === status) return;
+
+            const prev = app.status;
+            app.status = status;
+            try {
+                await axios.put(`${this.API}/job-applications/${app.id}`, { status });
+                const col = this.columns.find(c => c.id === status);
+                this.showToast(`Moved to ${col?.label ?? status}`, 'success');
+            } catch {
+                app.status = prev;
+                this.showToast('Failed to update status.', 'error');
+            }
+        },
+
+        openResumeModal(app) {
+            this.resumeTarget    = app;
+            this.resumeJobDesc   = app.job_description ?? '';
+            this.resumeFile      = null;
+            this.matchResult     = this.matchResults[app.id] ?? null;
+            this.showResumeModal = true;
+        },
+
+        onFileChange(e) { this.resumeFile = e.target.files[0] ?? null; },
+
+        async analyzeResume() {
+            if (!this.resumeFile || !this.resumeJobDesc.trim()) return;
+            this.analyzing = true;
+            try {
+                const form = new FormData();
+                form.append('resume', this.resumeFile);
+                form.append('job_description', this.resumeJobDesc);
+                const { data } = await axios.post(`${this.API}/resume-match`, form, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                this.matchResult = data.data ?? data;
+                if (this.resumeTarget) {
+                    this.matchResults[this.resumeTarget.id] = this.matchResult;
+                }
+                this.showToast('Analysis complete!', 'success');
+            } catch (e) {
+                this.showToast(e.response?.data?.message ?? 'Analysis failed.', 'error');
+            } finally {
+                this.analyzing = false;
+            }
+        },
+
+        getKeywords(app) {
+            const raw = app.keywords ?? app.extracted_keywords ?? app.watson_keywords
+                     ?? app.nlu_keywords ?? app.skills ?? [];
+            let arr = Array.isArray(raw) ? raw : (() => { try { return JSON.parse(raw); } catch { return []; } })();
+            return arr.slice(0, 5)
+                .map(k => typeof k === 'object' ? (k.text ?? k.keyword ?? '') : String(k))
+                .filter(Boolean);
+        },
+
+        getMatchScore(app) {
+            const r = this.matchResults[app.id];
+            return r ? (r.match_score ?? r.score ?? null) : null;
+        },
+
+        scoreClass(s) { return s >= 75 ? 'score-high' : s >= 50 ? 'score-mid' : 'score-low'; },
+        scoreHex(s)   { return s >= 75 ? '#3d9e6e'    : s >= 50 ? '#c9955a'   : '#c96464';   },
+
+        normalizeList(val) {
+            if (!val) return [];
+            if (Array.isArray(val)) return val;
+            try { return JSON.parse(val); } catch { return []; }
+        },
+
+        formatDate(iso) {
+            if (!iso) return '';
+            return new Date(iso).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' });
+        },
+
+        openNewJob() {
+            this.newJob = { company_name: '', position: '', job_description: '', job_url: '', status: 'saved' };
+            this.showNewJobModal = true;
+        },
+
+        showToast(msg, type = 'success') {
+            clearTimeout(this.toastTimer);
+            this.toast = { msg, type };
+            this.toastTimer = setTimeout(() => { this.toast = null; }, 3500);
+        },
+    },
+}).mount('#app');
+</script>
+</body>
+</html>
