@@ -571,7 +571,7 @@
     <div v-else-if="fatalError" class="state-screen">
         <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--col-rejected)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <p style="color:#e07777;font-weight:600">Cannot reach the API</p>
-        <p>Make sure Laravel is running on <code>http://localhost:8000</code></p>
+        <p>Could not connect to the API at <code>job-tracker-api-production-45c9.up.railway.app</code></p>
         <button class="btn btn-primary" @click="fetchApplications">Retry</button>
     </div>
 
@@ -787,7 +787,7 @@ const { createApp } = Vue;
 createApp({
     data() {
         return {
-            API: 'http://localhost:8000/api',
+            API: 'https://job-tracker-api-production-45c9.up.railway.app/api',
 
             applications: [],
             loading:      true,
