@@ -660,6 +660,22 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--clr-text-faint);
   font-family: var(--font-mono);
 }
+.cred-card__link {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--clr-accent);
+  margin-top: 6px;
+  align-self: flex-start;
+  transition: opacity var(--transition);
+}
+.cred-card__link:hover { opacity: 0.75; }
+
+/* Certificates grid */
+.certs__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
 
 /* ══ 9. Projects ════════════════════════════════════════════ */
 .projects__grid {
@@ -1098,6 +1114,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   :root { --section-pad: 72px; }
   .projects__grid  { grid-template-columns: repeat(2, 1fr); }
   .skills__grid    { grid-template-columns: repeat(2, 1fr); }
+  .certs__grid     { grid-template-columns: repeat(2, 1fr); }
   .demo-layout     { grid-template-columns: 1fr; }
   .about__grid     { grid-template-columns: 1fr; gap: 40px; }
   .contact__layout { grid-template-columns: 1fr; gap: 40px; }
@@ -1135,6 +1152,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
   /* Skills */
   .skills__grid { grid-template-columns: 1fr; }
+
+  /* Certificates */
+  .certs__grid { grid-template-columns: 1fr; }
 
   /* Contact */
   .form-row { grid-template-columns: 1fr; }
