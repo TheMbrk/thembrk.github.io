@@ -4,3 +4,4 @@ deploy.bat
 .claude/
 assets/hero_section*.png
 assets/hero_new_cropped.png
+SESSION_LOG.md
