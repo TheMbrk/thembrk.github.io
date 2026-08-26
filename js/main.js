@@ -108,6 +108,89 @@ document.addEventListener('DOMContentLoaded', function () {
   var demoInput    = document.getElementById('demo-input');
   var demoSend     = document.getElementById('demo-send');
 
+  // ── Minimal, safe markdown renderer for bot replies ──────
+  // The model returns markdown (tables, **bold**, lists). textContent showed
+  // it raw, which looked broken. This escapes ALL raw text first, then adds
+  // only a controlled tag subset, so model output can never inject HTML.
+  function mdEscape(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function mdInline(s) {
+    // s is already HTML-escaped
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+                  '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    return s;
+  }
+  function mdRow(row) {
+    var r = row.trim();
+    if (r.charAt(0) === '|') r = r.slice(1);
+    if (r.charAt(r.length - 1) === '|') r = r.slice(0, -1);
+    return r.split('|').map(function (c) { return c.trim(); });
+  }
+  function isTableSep(line) {
+    return /\|/.test(line) && /-/.test(line) && /^[\s|:-]+$/.test(line);
+  }
+  function renderMarkdown(md) {
+    var lines = String(md).replace(/\r\n/g, '\n').split('\n');
+    var out = [];
+    var i = 0;
+    while (i < lines.length) {
+      var line = lines[i];
+      // Table
+      if (/\|/.test(line) && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+        var head = mdRow(line);
+        i += 2;
+        var body = [];
+        while (i < lines.length && /\|/.test(lines[i]) && lines[i].trim() !== '') {
+          body.push(mdRow(lines[i])); i++;
+        }
+        var t = '<div class="chat-table-wrap"><table class="chat-table"><thead><tr>';
+        head.forEach(function (c) { t += '<th>' + mdInline(mdEscape(c)) + '</th>'; });
+        t += '</tr></thead><tbody>';
+        body.forEach(function (r) {
+          t += '<tr>';
+          r.forEach(function (c) { t += '<td>' + mdInline(mdEscape(c)) + '</td>'; });
+          t += '</tr>';
+        });
+        out.push(t + '</tbody></table></div>');
+        continue;
+      }
+      // Heading
+      var h = line.match(/^(#{1,4})\s+(.*)$/);
+      if (h) { out.push('<strong class="chat-h">' + mdInline(mdEscape(h[2])) + '</strong>'); i++; continue; }
+      // Unordered list
+      if (/^\s*[-*]\s+/.test(line)) {
+        var ul = '<ul class="chat-list">';
+        while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
+          ul += '<li>' + mdInline(mdEscape(lines[i].replace(/^\s*[-*]\s+/, ''))) + '</li>'; i++;
+        }
+        out.push(ul + '</ul>'); continue;
+      }
+      // Ordered list
+      if (/^\s*\d+\.\s+/.test(line)) {
+        var ol = '<ol class="chat-list">';
+        while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
+          ol += '<li>' + mdInline(mdEscape(lines[i].replace(/^\s*\d+\.\s+/, ''))) + '</li>'; i++;
+        }
+        out.push(ol + '</ol>'); continue;
+      }
+      // Blank
+      if (line.trim() === '') { i++; continue; }
+      // Paragraph
+      var para = [];
+      while (i < lines.length && lines[i].trim() !== '' &&
+             !/^\s*[-*]\s+/.test(lines[i]) && !/^\s*\d+\.\s+/.test(lines[i]) &&
+             !/^#{1,4}\s+/.test(lines[i]) &&
+             !(/\|/.test(lines[i]) && i + 1 < lines.length && isTableSep(lines[i + 1]))) {
+        para.push(lines[i]); i++;
+      }
+      out.push('<p>' + mdInline(mdEscape(para.join(' '))) + '</p>');
+    }
+    return out.join('');
+  }
+
   function appendDemoMsg(text, type) {
     var wrap   = document.createElement('div');
     wrap.className = 'demo-msg demo-msg--' + type;
@@ -118,7 +201,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var bubble = document.createElement('div');
     bubble.className = 'demo-msg__bubble';
-    bubble.textContent = text;
+    // Bot replies are markdown; user text is inserted safely as plain text.
+    if (type === 'user') { bubble.textContent = text; }
+    else { bubble.innerHTML = renderMarkdown(text); }
 
     wrap.appendChild(avatar);
     wrap.appendChild(bubble);
@@ -162,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var data  = await res.json();
       var reply = data.reply || data.error || 'Sorry, I could not get a response.';
       chatHistory.push({ role: 'assistant', content: reply });
-      typingBubble.textContent = reply;
+      typingBubble.innerHTML = renderMarkdown(reply);
       typingWrap.classList.remove('demo-msg--typing');
     } catch (err) {
       var isLocalFile = window.location.protocol === 'file:';
